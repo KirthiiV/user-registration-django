@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>User Registration</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f6fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            margin-top: 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            width: 450px;
+        }
+
+        h2, h3 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Tabs */
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-container button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: #0284c7;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .tab-container button:hover {
+            background-color: #0369a1;
+        }
+
+        .tab-content {
+            display: none;
+            padding-top: 10px;
+        }
+
+        .active {
+            display: block;
+        }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .submit-btn {
+            padding: 12px;
+            background-color: #10b981;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #059669;
+        }
+
+        /* Success Message */
+        .success-msg {
+            color: #047857;
+            background-color: #d1fae5;
+            border-left: 5px solid #059669;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* JSON Output */
+        #jsonOutput {
+            width: 100%;
+            height: 180px;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            background-color: #f4f4f4;
+            font-family: monospace;
+            font-size: 13px;
+            resize: none;
+        }
+
+        .copy-btn {
+            padding: 12px;
+            background-color: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>User Registration</h2>
+
+    {% if success %}
+        <div class="success-msg">✔ Registration submitted successfully!</div>
+    {% endif %}
+
+    <div class="tab-container">
+        <button onclick="showTab('formTab')">Form</button>
+        {% if success %}
+            <button onclick="showTab('copyTab')">Copy JSON</button>
+        {% endif %}
+    </div>
+
+    <!-- Form Tab -->
+    <div id="formTab" class="tab-content active">
+        <h3>Register User</h3>
+        <form method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+                    {% if field.field.widget.input_type == "checkbox" %}
+                        <div class="checkbox-group">
+                            {{ field }}
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                    {% if field.errors %}
+                        <div style="color:red; font-size:12px;">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="submit-btn">Submit</button>
+        </form>
+    </div>
+
+    <!-- JSON Tab -->
+    <div id="copyTab" class="tab-content">
+        <h3>Submitted JSON Data</h3>
+        <textarea id="jsonOutput">{{ user_data }}</textarea>
+        <button class="copy-btn" onclick="copyJSON()">📋 Copy JSON</button>
+    </div>
+
+</div>
+
+<script>
+function showTab(tabId){
+    document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+    document.getElementById(tabId).style.display = 'block';
+}
+
+function copyJSON(){
+    const text = document.getElementById('jsonOutput');
+    text.select();
+    navigator.clipboard.writeText(text.value)
+        .then(() => alert("Copied successfully!"))
+        .catch(() => alert("Copy failed"));
+}
+</script>
+
+</body>
+</html>

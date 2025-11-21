@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registered Users</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: center;
+        }
+        button {
+            margin-top: 10px;
+            padding: 8px 14px;
+            cursor: pointer;
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        a {
+            text-decoration: none;
+            color: #0284c7;
+            font-weight: bold;
+        }
+        .success-message {
+            background-color: #d1fadf;
+            padding: 10px;
+            width: 50%;
+            border-left: 5px solid #0f8533;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+    </style>
+
+    <script>
+        function copyJson() {
+            const jsonText = document.getElementById("json-output").textContent.trim();
+
+            navigator.clipboard.writeText(jsonText)
+                .then(() => {
+                    alert("📋 JSON copied successfully!");
+                })
+                .catch(err => {
+                    alert("Copy failed. Try manually.");
+                    console.error(err);
+                });
+        }
+    </script>
+</head>
+<body>
+
+<h2>Registered Users</h2>
+
+{% if messages %}
+    {% for msg in messages %}
+        <div class="success-message">
+            ✔ {{ msg }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+{% if users %}
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Email</th>
+        <th>Active</th>
+        <th>DOB</th>
+        <th>Gender</th>
+    </tr>
+
+    {% for user in users %}
+    <tr>
+        <td>{{ user.name }}</td>
+        <td>{{ user.age }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.is_active }}</td>
+        <td>{{ user.dob }}</td>
+        <td>{{ user.gender }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<hr>
+
+<h3>JSON Format</h3>
+
+<pre id="json-output" style="white-space: pre-wrap; background:#f4f4f4; padding:15px; border-radius:6px;">
+[
+{% for user in users %}
+    {
+        "name": "{{ user.name }}",
+        "age": "{{ user.age }}",
+        "email": "{{ user.email }}",
+        "is_active": "{{ user.is_active }}",
+        "dob": "{{ user.dob }}",
+        "gender": "{{ user.gender }}"
+    }{% if not forloop.last %},{% endif %}
+{% endfor %}
+]
+</pre>
+
+<button onclick="copyJson()">📋 Copy JSON</button>
+
+{% else %}
+<p>No registered users yet.</p>
+{% endif %}
+
+<br><br>
+<a href="/user-page/register/">➕ Register New User</a>
+
+</body>
+</html>
